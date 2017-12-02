@@ -2,7 +2,7 @@
 
 [git常用命令](http://www.bootcss.com/p/git-guide/)
 
-#Git基本常用命令如下
+# Git基本常用命令如下
 *  mkdir：      XX (创建一个空目录 XX指目录名) 
 *  pwd：      显示当前目录的路径
 *  git init   把当前的目录变成可以管理的git仓库，生成隐藏.git文件
