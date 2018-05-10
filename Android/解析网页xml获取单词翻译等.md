@@ -10,7 +10,7 @@
 http://dict-co.iciba.com/api/dictionary.php?w=word&key=05C4F33DDAE7C18C6C24259B7C289136
 ```
 
-以单词word为例，在网页上生成xml文件：
+以单词"word"为例，在网页上生成xml文件：
 
 ```xml
 <dict num="219" id="219" name="219">
@@ -90,7 +90,9 @@ public class Word {
 
 ```
 
-CheckActivity如下：
+sendRequestWithOkHttp();函数用于发送http请求，parseXMLWithPull函数用来解析xml。
+
+完整的CheckActivity如下：
 
 ```java
 package com.example.playenglish;
@@ -176,8 +178,6 @@ public class CheckActivity extends AppCompatActivity {
                 }
 
             }
-
-
         });
     }
 
@@ -250,3 +250,85 @@ public class CheckActivity extends AppCompatActivity {
 
 输出结果：
 
+```java
+05-10 09:35:25.152 13525-13579/com.example.playenglish D/CheckActivity: parseXMLWithPull: hello
+05-10 09:35:25.152 13525-13579/com.example.playenglish D/CheckActivity: parseXMLWithPull: həˈloʊ
+```
+
+
+
+另一种方法：（可以获得单词翻译，至于发音之类的就不确定了）
+
+这种方法使用[有道智云](http://ai.youdao.com/gw.s)提供的API:
+
+[下载官方提供的API](http://ai.youdao.com/download.s)
+
+在sec下新建目录jniLibs，把下好的jar文件添加到该目录里面，并在build.gradle(app)里面添加sourceSets.main:
+
+```java
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.example.playenglish"
+        minSdkVersion 15
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    sourceSets.main {
+        jniLibs.srcDirs = ['src/jniLibs']
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+```
+
+然后在onCreate中添加:YouDaoApplication.init(this, "ID");
+
+```java
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_check);
+        
+        YouDaoApplication.init(this, "0daee4533f3fc7d6");
+        
+        init();
+        inClick();
+    }
+```
+
+然后在点击事件里加：
+
+```java
+Language langFrom = LanguageUtils.getLangByName("英文");
+Language langTo = LanguageUtils.getLangByName("中文");
+TranslateParameters tps = new TranslateParameters.Builder()
+   	.source("playenglish")
+   	.from(langFrom).to(langTo).build();
+Translator translator = Translator.getInstance(tps);
+//0daee4533f3fc7d6   6c8f1b9c3f3f0c9f
+translator.lookup(word, "0daee4533f3fc7d6", new TranslateListener() {
+   	@Override
+   	public void onError(TranslateErrorCode translateErrorCode, String s) {
+       	Log.e(TAG, "onError: " + translateErrorCode.getCode() + ";" + s);
+   	}
+   	@Override
+   	public void onResult(Translate translate, String s, String s1) {
+       	String result = translate.getTranslations().toString();
+       	//MainActivity.makeToast(result);
+       	Log.d(TAG, "onResult: " + result);
+   	}
+   	@Override
+   	public void onResult(List<Translate> list, List<String> list1, List<TranslateErrorCode> list2, String s) {
+
+     }
+});
+```
+
+其中word是要翻译的单词。
