@@ -57,9 +57,27 @@ git config --global http.postBuffer 524288000
 
 打开git bash命令行工具。 
 
-注意要加上--global。网上很多资料都没加这个参数。不加执行的话会报以下错误的： 
+注意要加上--global（设置缓存）。网上很多资料都没加这个参数。不加执行的话会报以下错误的： 
 
 ```java
 error:could not lock config file .git/config: no such file or directory.
+```
+
+
+
+
+
+自测：不加--global也可以。。。。
+
+第二次错误如下：
+
+```java
+error: RPC failed; curl 56 OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 10054
+```
+
+解决办法：
+
+```java
+git config http.postBuffer 524288000
 ```
 
